@@ -167,8 +167,16 @@
       }
 
       const icon = document.createElement("div");
-      icon.className = "product-icon";
-      icon.innerHTML = iconFor(product.category);
+      if (product.logo) {
+        icon.className = "product-icon has-logo";
+        const img = document.createElement("img");
+        img.src = "assets/icons/" + product.logo + ".svg";
+        img.alt = "";
+        icon.appendChild(img);
+      } else {
+        icon.className = "product-icon";
+        icon.innerHTML = iconFor(product.category);
+      }
       card.appendChild(icon);
 
       const name = document.createElement("div");
