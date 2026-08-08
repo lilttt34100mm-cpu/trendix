@@ -48,6 +48,10 @@
     </nav>
 
     <div class="header-actions">
+      <button class="cart-toggle" type="button" aria-label="Cart" data-cart-toggle>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </button>
       <div class="lang-toggle" role="group" aria-label="Language">
         <button type="button" data-lang="ar" aria-pressed="true">AR</button>
         <button type="button" data-lang="en" aria-pressed="false">EN</button>
@@ -77,6 +81,33 @@
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="20" height="20"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.33 4.95L2.05 22l5.3-1.39a9.9 9.9 0 0 0 4.69 1.2h.01c5.46 0 9.9-4.45 9.9-9.9 0-2.64-1.03-5.13-2.9-7-1.87-1.87-4.36-2.91-7-2.91Z"/></svg>
       <span data-i18n="nav.cta">Order on WhatsApp</span>
     </a>
+  </div>
+</div>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="cart-drawer" data-cart-drawer>
+  <div class="cart-drawer-panel">
+    <div class="cart-drawer-head">
+      <h2 data-i18n="cart.title">Your cart</h2>
+      <button class="cart-drawer-close" type="button" aria-label="Close cart" data-cart-close>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="cart-drawer-body" data-cart-body>
+      <!-- rendered by catalog.js -->
+    </div>
+
+    <div class="cart-drawer-foot" data-cart-foot>
+      <div class="cart-total-row">
+        <span data-i18n="cart.total">Total</span>
+        <span class="cart-total-amount" data-cart-total>$0</span>
+      </div>
+      <a class="btn btn-whatsapp btn-block" href="#" data-cart-checkout target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.33 4.95L2.05 22l5.3-1.39a9.9 9.9 0 0 0 4.69 1.2h.01c5.46 0 9.9-4.45 9.9-9.9 0-2.64-1.03-5.13-2.9-7-1.87-1.87-4.36-2.91-7-2.91Zm0 18.06h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.14.83.84-3.06-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.55 3.71-8.26 8.27-8.26 2.21 0 4.28.86 5.85 2.42a8.2 8.2 0 0 1 2.42 5.85c0 4.56-3.71 8.24-8.28 8.24Z"/></svg>
+        <span data-i18n="cart.checkout">Checkout on WhatsApp</span>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -207,63 +238,20 @@
     <div class="container" style="padding-block: var(--space-xl);">
       <div class="section-head" data-reveal>
         <span class="eyebrow" data-i18n="catalog.eyebrow">What we get you</span>
-        <h2 data-i18n="catalog.title">If it has a subscription or a price tag, ask us.</h2>
-        <p data-i18n="catalog.sub">A few examples below — our catalog isn't limited to these.</p>
+        <h2 data-i18n="catalog.title">Browse the catalog, add to cart, check out on WhatsApp.</h2>
+        <p data-i18n="catalog.sub">Don't see what you need? Message us — our catalog isn't limited to this list.</p>
       </div>
 
-      <div class="catalog-grid" data-reveal-group>
-        <article class="catalog-card spotlight glass-edge" data-reveal>
-          <div class="glow"></div>
-          <div class="catalog-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          </div>
-          <h3 data-i18n="catalog.1.title">Streaming &amp; entertainment</h3>
-          <p class="desc" data-i18n="catalog.1.desc">Watch and listen without needing a foreign card on file.</p>
-          <div class="catalog-examples">
-            <span data-i18n="catalog.1.ex1">Netflix</span><span data-i18n="catalog.1.ex2">Shahid</span><span data-i18n="catalog.1.ex3">Spotify</span><span data-i18n="catalog.1.ex4">YouTube Premium</span><span data-i18n="catalog.1.ex5">Disney+</span>
-          </div>
-          <a class="btn btn-ghost btn-sm btn-block" href="#" data-wa="streaming" target="_blank" rel="noopener" data-i18n="catalog.1.btn">Ask about streaming</a>
-        </article>
-
-        <article class="catalog-card spotlight glass-edge" data-reveal>
-          <div class="glow"></div>
-          <div class="catalog-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="4"/><circle cx="8" cy="12.5" r="1.4"/><circle cx="16" cy="12.5" r="1.4"/><path d="M8 10.5v4M6 12.5h4"/></svg>
-          </div>
-          <h3 data-i18n="catalog.2.title">Gaming</h3>
-          <p class="desc" data-i18n="catalog.2.desc">Top up wallets and subscriptions for console and PC.</p>
-          <div class="catalog-examples">
-            <span data-i18n="catalog.2.ex1">PlayStation Plus</span><span data-i18n="catalog.2.ex2">Xbox Game Pass</span><span data-i18n="catalog.2.ex3">Steam Wallet</span><span data-i18n="catalog.2.ex4">In-game top-ups</span>
-          </div>
-          <a class="btn btn-ghost btn-sm btn-block" href="#" data-wa="gaming" target="_blank" rel="noopener" data-i18n="catalog.2.btn">Ask about gaming</a>
-        </article>
-
-        <article class="catalog-card spotlight glass-edge" data-reveal>
-          <div class="glow"></div>
-          <div class="catalog-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
-          </div>
-          <h3 data-i18n="catalog.3.title">Productivity &amp; AI</h3>
-          <p class="desc" data-i18n="catalog.3.desc">Get the pro tools and AI assistants you rely on daily.</p>
-          <div class="catalog-examples">
-            <span data-i18n="catalog.3.ex1">ChatGPT Plus</span><span data-i18n="catalog.3.ex2">Canva Pro</span><span data-i18n="catalog.3.ex3">Adobe Creative Cloud</span><span data-i18n="catalog.3.ex4">Microsoft 365</span>
-          </div>
-          <a class="btn btn-ghost btn-sm btn-block" href="#" data-wa="apps" target="_blank" rel="noopener" data-i18n="catalog.3.btn">Ask about apps</a>
-        </article>
-
-        <article class="catalog-card spotlight glass-edge" data-reveal>
-          <div class="glow"></div>
-          <div class="catalog-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18 9 9 0 0 1 0-18z" opacity="0"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
-          </div>
-          <h3 data-i18n="catalog.4.title">Something else</h3>
-          <p class="desc" data-i18n="catalog.4.desc">Don't see it listed? Send us the name and we'll price it.</p>
-          <div class="catalog-examples">
-            <span data-i18n="catalog.4.ex1">Custom requests</span><span data-i18n="catalog.4.ex2">Regional apps</span><span data-i18n="catalog.4.ex3">Gift cards</span><span data-i18n="catalog.4.ex4">In-game currencies</span>
-          </div>
-          <a class="btn btn-ghost btn-sm btn-block" href="#" data-wa="other" target="_blank" rel="noopener" data-i18n="catalog.4.btn">Ask us anything</a>
-        </article>
+      <div class="catalog-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="search" data-catalog-search autocomplete="off">
       </div>
+
+      <div class="catalog-tabs" role="tablist" data-catalog-tabs></div>
+
+      <div class="product-grid" data-product-grid></div>
+
+      <p class="catalog-empty" data-catalog-empty hidden data-i18n="catalog.empty">No products match your search.</p>
     </div>
   </section>
 
@@ -409,6 +397,8 @@
 }
 </script>
 <script src="js/i18n.js"></script>
+<script src="js/products.js"></script>
+<script src="js/catalog.js"></script>
 <script src="js/main.js"></script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2289f8363fb542cfb21833ed9895d600"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

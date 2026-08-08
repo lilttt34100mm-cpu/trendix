@@ -40,6 +40,8 @@
     });
 
     try { localStorage.setItem("trendix-lang", lang); } catch (e) {}
+
+    document.dispatchEvent(new CustomEvent("trendix:langchange", { detail: { lang } }));
   }
 
   function initLang() {
@@ -263,7 +265,7 @@
      ============================================================ */
   function initCardTilt() {
     if (isTouch || prefersReducedMotion || !hasGsap) return;
-    document.querySelectorAll(".catalog-card").forEach((card) => {
+    document.querySelectorAll(".product-card").forEach((card) => {
       const rotX = gsap.quickTo(card, "rotateX", { duration: 0.4, ease: "power3.out" });
       const rotY = gsap.quickTo(card, "rotateY", { duration: 0.4, ease: "power3.out" });
       card.addEventListener("mousemove", (e) => {
@@ -300,7 +302,7 @@
   function initMobileCardMotion() {
     if (!hasGsap || !window.ScrollTrigger || prefersReducedMotion) return;
     if (!(isTouch || window.innerWidth < 900)) return;
-    const cards = document.querySelectorAll(".step-card, .catalog-card, .why-item, .faq-item");
+    const cards = document.querySelectorAll(".step-card, .product-card, .why-item, .faq-item");
     cards.forEach((card) => {
       gsap.fromTo(
         card,
