@@ -473,7 +473,7 @@ html[dir="rtl"] .mobile-nav-panel { transform: translateX(-100%); }
   position: absolute;
   z-index: 1;
   bottom: 28px;
-  inset-inline-start: 50%;
+  left: 50%; /* physical, not logical — this must stay dead-center regardless of dir */
   transform: translateX(-50%);
   width: 40px;
   height: 40px;
@@ -520,7 +520,7 @@ html[dir="rtl"] .mobile-nav-panel { transform: translateX(-100%); }
 }
 .marquee::before { inset-inline-start: 0; background: linear-gradient(to right, var(--bg-alt), transparent); }
 .marquee::after { inset-inline-end: 0; background: linear-gradient(to left, var(--bg-alt), transparent); }
-.marquee-track { display: flex; gap: 14px; width: max-content; }
+.marquee-track { display: flex; gap: 14px; width: max-content; direction: ltr; }
 .marquee-track .pill {
   display: inline-flex;
   align-items: center;
