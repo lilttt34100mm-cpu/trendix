@@ -170,7 +170,7 @@
       if (product.logo) {
         icon.className = "product-icon has-logo";
         const img = document.createElement("img");
-        img.src = "assets/icons/" + product.logo + ".svg";
+        img.src = "assets/icons/" + product.logo;
         img.alt = "";
         icon.appendChild(img);
       } else {
