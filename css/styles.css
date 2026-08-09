@@ -518,8 +518,12 @@ html[dir="rtl"] .mobile-nav-panel { transform: translateX(-100%); }
   z-index: 2;
   pointer-events: none;
 }
-.marquee::before { inset-inline-start: 0; background: linear-gradient(to right, var(--bg-alt), transparent); }
-.marquee::after { inset-inline-end: 0; background: linear-gradient(to left, var(--bg-alt), transparent); }
+/* physical left/right on purpose: the track inside is forced direction:ltr,
+   so these edge fades must stay physically pinned too, or dir=rtl flips
+   their position while the gradient itself stays pointed the old way —
+   opaque lands mid-track and the real edge is left with a hard cutoff. */
+.marquee::before { left: 0; background: linear-gradient(to right, var(--bg-alt), transparent); }
+.marquee::after { right: 0; background: linear-gradient(to left, var(--bg-alt), transparent); }
 .marquee-track { display: flex; gap: 14px; width: max-content; direction: ltr; }
 .marquee-track .pill {
   display: inline-flex;
