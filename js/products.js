@@ -9,7 +9,10 @@
    Office ProPlus which are both current Microsoft Office branding).
    "desc"/"descAr" (optional): short one-line pitch shown on the card.
    "limitedSpots" (optional): monthly inventory cap shown as a scarcity
-   badge on the card (purely informational — not enforced by the cart). */
+   badge on the card (purely informational — not enforced by the cart).
+   "topSellerRank" (optional, only matters within the "Top Sellers" tab):
+   lower sorts first; items without it keep their natural array order
+   after all ranked items. */
 
 const CATEGORIES = [
   { key: "top", name: "Top Sellers", nameAr: "الأكثر مبيعًا" },
@@ -125,7 +128,7 @@ const PRODUCTS = [
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 40 }] },
   { id: "rezi-ai", name: "Rezi AI — Resume Builder", category: "learning", topSeller: false, logo: "rezi.png",
     plans: [{ label: "Lifetime", labelAr: "مدى الحياة", price: 55 }] },
-  { id: "tiktok-monetized-account", name: "TikTok Monetized Account", category: "learning", topSeller: true, logo: "tiktok.png",
+  { id: "tiktok-monetized-account", name: "TikTok Monetized Account", category: "learning", topSeller: true, topSellerRank: 1, logo: "tiktok.png",
     desc: "Eligible for profit on video views.", descAr: "مؤهل لتحقيق أرباح من مشاهدات الفيديو.",
     limitedSpots: 12,
     plans: [{ label: "Monthly", labelAr: "شهريًا", price: 25 }] }

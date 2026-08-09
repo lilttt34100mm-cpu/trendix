@@ -207,6 +207,17 @@
   /* ============================================================
      Filtering
      ============================================================ */
+  function sortTopSellers(list) {
+    return list
+      .map((p, i) => ({ p, i }))
+      .sort((a, b) => {
+        const ra = a.p.topSellerRank != null ? a.p.topSellerRank : Infinity;
+        const rb = b.p.topSellerRank != null ? b.p.topSellerRank : Infinity;
+        return ra !== rb ? ra - rb : a.i - b.i;
+      })
+      .map((x) => x.p);
+  }
+
   function filteredProducts() {
     let list = PRODUCTS.filter((p) => (activeCategory === "top" ? p.topSeller : p.category === activeCategory));
     const q = searchQuery.trim().toLowerCase();
@@ -218,6 +229,7 @@
       /* if nothing matches within the tab, widen the search to the whole catalog */
       if (!list.length) list = PRODUCTS.filter((p) => p.name.toLowerCase().includes(q));
     }
+    if (activeCategory === "top") list = sortTopSellers(list);
     return list;
   }
 
@@ -250,8 +262,15 @@
   function renderGrid() {
     const grid = document.querySelector("[data-product-grid]");
     const emptyEl = document.querySelector("[data-catalog-empty]");
+    const trendingNote = document.querySelector("[data-catalog-trending-note]");
     if (!grid) return;
     grid.innerHTML = "";
+
+    if (trendingNote) {
+      const showNote = activeCategory === "top" && !searchQuery.trim();
+      trendingNote.hidden = !showNote;
+      if (showNote) trendingNote.textContent = t("catalog.trending");
+    }
 
     const list = filteredProducts();
     if (emptyEl) emptyEl.hidden = list.length > 0;
