@@ -95,10 +95,6 @@ const PRODUCTS = [
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 122 }] },
   { id: "linkedin-career", name: "LinkedIn Career", category: "business", topSeller: false, logo: "linkedin.svg",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 110 }] },
-  { id: "tiktok-monetized-account", name: "TikTok Monetized Account", category: "business", topSeller: false, logo: "tiktok.png",
-    desc: "Eligible for profit on video views.", descAr: "مؤهل لتحقيق أرباح من مشاهدات الفيديو.",
-    limitedSpots: 12,
-    plans: [{ label: "Monthly", labelAr: "شهريًا", price: 25 }] },
 
   // ---------------- Engineering & CAD ----------------
   { id: "autodesk-all-apps", name: "AutoDesk — All Apps", category: "engineering", topSeller: false, logo: "autodesk.svg",
@@ -128,5 +124,9 @@ const PRODUCTS = [
   { id: "duolingo-super", name: "Duolingo Super", category: "learning", topSeller: false, logo: "duolingo.svg",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 40 }] },
   { id: "rezi-ai", name: "Rezi AI — Resume Builder", category: "learning", topSeller: false, logo: "rezi.png",
-    plans: [{ label: "Lifetime", labelAr: "مدى الحياة", price: 55 }] }
+    plans: [{ label: "Lifetime", labelAr: "مدى الحياة", price: 55 }] },
+  { id: "tiktok-monetized-account", name: "TikTok Monetized Account", category: "learning", topSeller: true, logo: "tiktok.png",
+    desc: "Eligible for profit on video views.", descAr: "مؤهل لتحقيق أرباح من مشاهدات الفيديو.",
+    limitedSpots: 12,
+    plans: [{ label: "Monthly", labelAr: "شهريًا", price: 25 }] }
 ];
