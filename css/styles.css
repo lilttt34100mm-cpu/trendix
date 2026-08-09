@@ -64,7 +64,10 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  cursor: default; /* stop the text-select (I-beam) cursor over plain copy — links/buttons/inputs restore their own cursor below */
 }
+input, textarea, select { cursor: auto; }
+input[type="search"], input[type="text"], textarea { cursor: text; }
 html[lang="ar"] body { font-family: var(--font-ar); }
 h1, h2, h3, h4 { font-family: var(--font-en-heading); margin: 0; line-height: 1.15; font-weight: 700; }
 html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4 { font-family: var(--font-ar); font-weight: 800; }
