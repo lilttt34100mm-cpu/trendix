@@ -6,7 +6,10 @@
    points at that brand's real official mark. Products sharing a logo
    file only do so when they ARE the same brand (e.g. the 3 Autodesk
    products, the 2 LinkedIn plans, the 2 Duolingo plans, MS365 +
-   Office ProPlus which are both current Microsoft Office branding). */
+   Office ProPlus which are both current Microsoft Office branding).
+   "desc"/"descAr" (optional): short one-line pitch shown on the card.
+   "limitedSpots" (optional): monthly inventory cap shown as a scarcity
+   badge on the card (purely informational — not enforced by the cart). */
 
 const CATEGORIES = [
   { key: "top", name: "Top Sellers", nameAr: "الأكثر مبيعًا" },
@@ -24,7 +27,7 @@ const PRODUCTS = [
   { id: "google-ai-ultra", name: "Google AI Ultra", category: "ai", topSeller: false, logo: "googlegemini.png",
     plans: [{ label: "1 Month", labelAr: "شهر واحد", price: 75 }] },
   { id: "claude-pro", name: "Claude Pro", category: "ai", topSeller: true, badge: "popular", logo: "claude.svg",
-    plans: [{ label: "1 Month", labelAr: "شهر واحد", price: 23 }] },
+    plans: [{ label: "1 Month", labelAr: "شهر واحد", price: 19 }] },
   { id: "perplexity-pro", name: "Perplexity AI Pro", category: "ai", topSeller: false, logo: "perplexity.png",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 80 }] },
   { id: "manus-ai-pro", name: "Manus AI Pro", category: "ai", topSeller: false, logo: "manus.png",
@@ -92,6 +95,10 @@ const PRODUCTS = [
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 122 }] },
   { id: "linkedin-career", name: "LinkedIn Career", category: "business", topSeller: false, logo: "linkedin.svg",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 110 }] },
+  { id: "tiktok-monetized-account", name: "TikTok Monetized Account", category: "business", topSeller: false, logo: "tiktok.png",
+    desc: "Eligible for profit on video views.", descAr: "مؤهل لتحقيق أرباح من مشاهدات الفيديو.",
+    limitedSpots: 12,
+    plans: [{ label: "Monthly", labelAr: "شهريًا", price: 25 }] },
 
   // ---------------- Engineering & CAD ----------------
   { id: "autodesk-all-apps", name: "AutoDesk — All Apps", category: "engineering", topSeller: false, logo: "autodesk.svg",

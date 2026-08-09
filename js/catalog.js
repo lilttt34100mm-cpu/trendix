@@ -293,6 +293,26 @@
         card.appendChild(catLabel);
       }
 
+      if (product.desc || product.descAr) {
+        const descEl = document.createElement("p");
+        descEl.className = "product-desc";
+        descEl.textContent = currentLang() === "ar" ? (product.descAr || product.desc) : (product.desc || product.descAr);
+        card.appendChild(descEl);
+      }
+
+      if (product.limitedSpots) {
+        const limited = document.createElement("span");
+        limited.className = "product-limited";
+        limited.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>' +
+          "<span>" +
+          (currentLang() === "ar"
+            ? "بس " + product.limitedSpots + " مكان بالشهر"
+            : "Only " + product.limitedSpots + " spots/month")
+          + "</span>";
+        card.appendChild(limited);
+      }
+
       if (!(product.id in uiPlan)) uiPlan[product.id] = product.id in cart ? cart[product.id] : 0;
       const selectedIndex = uiPlan[product.id];
 

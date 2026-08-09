@@ -701,6 +701,21 @@ html[lang="ar"] .product-badge { text-transform: none; letter-spacing: 0; }
 
 .product-name { font-size: 17px; font-weight: 700; line-height: 1.3; }
 .product-category { font-size: 12.5px; color: var(--text-dim); margin-top: -6px; }
+.product-desc { font-size: 13px; color: var(--text-muted); line-height: 1.45; margin: 0; }
+.product-limited {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.3);
+  color: #fbbf24;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.product-limited svg { width: 12px; height: 12px; flex-shrink: 0; }
 
 .product-plans { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .plan-chip {
