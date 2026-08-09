@@ -509,7 +509,12 @@ html[dir="rtl"] .mobile-nav-panel { transform: translateX(-100%); }
    Marquee trust bar
    ============================================================ */
 .trust-bar { padding-block: var(--space-lg); border-block: 1px solid var(--border-soft); background: var(--bg-alt); }
-.marquee { overflow: hidden; position: relative; }
+/* direction:ltr here too, not just on the track: CSS anchors overflowing
+   content to the SCROLL CONTAINER's own direction, not its child's — with
+   dir=rtl inherited here the oversized track anchors flush-right and clips
+   almost entirely off-screen to the left, which is what showed as a fully
+   blank bar. */
+.marquee { overflow: hidden; position: relative; direction: ltr; }
 .marquee::before, .marquee::after {
   content: "";
   position: absolute;
