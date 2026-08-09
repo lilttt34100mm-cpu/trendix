@@ -9,12 +9,13 @@
   /* ============================================================
      Cart incentive config — the ONE place to change thresholds/%s.
      Thresholds are grounded in the catalog's actual top-seller prices
-     (avg. top-seller ≈ $29): milestone 1 sits at ~1.5x that average,
-     milestone 2 roughly double milestone 1.
+     (avg. top-seller ≈ $34, after the $5 flat price increase):
+     milestone 1 sits at ~1.5x that average, milestone 2 double
+     milestone 1.
      ============================================================ */
   const CART_MILESTONES = [
-    { threshold: 45, discountPercent: 5 },
-    { threshold: 90, discountPercent: 10 }
+    { threshold: 50, discountPercent: 5 },
+    { threshold: 100, discountPercent: 10 }
   ];
   /* higher-margin products to prefer suggesting when one of them alone
      closes the gap to the next milestone, in priority order */
