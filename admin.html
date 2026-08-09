@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Trendix — Orders Dashboard</title>
+<style>
+  :root {
+    --bg: #090c14; --bg-alt: #0d1220; --surface: #121728; --surface-2: #1a2138;
+    --border: #232d48; --border-soft: #1a2338; --text: #f5f7fc; --text-muted: #a6b0cc;
+    --text-dim: #6e7893; --primary: #3b82f6; --primary-2: #8b5cf6; --accent-cyan: #22d3ee;
+    --whatsapp: #25d366; --danger: #f87171; --warn: #fbbf24;
+    --grad-brand: linear-gradient(120deg, var(--accent-cyan) 0%, var(--primary) 48%, var(--primary-2) 100%);
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", Inter, Arial, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+  header h1 { font-size: 20px; margin: 0; }
+  header h1 span { background: var(--grad-brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  button { font: inherit; cursor: pointer; border: none; border-radius: 8px; }
+  .btn { padding: 10px 18px; background: var(--grad-brand); color: #06101f; font-weight: 700; }
+  .btn-ghost { padding: 8px 14px; background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--primary); }
+
+  /* login */
+  #login-screen { max-width: 380px; margin: 90px auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; }
+  #login-screen h2 { margin: 0 0 6px; font-size: 18px; }
+  #login-screen p { color: var(--text-dim); font-size: 13.5px; margin: 0 0 20px; }
+  #login-screen input {
+    width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg-alt); color: var(--text); font-size: 14px; margin-bottom: 12px;
+  }
+  #login-screen .btn { width: 100%; }
+  #login-error { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 26px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .stat-card .label { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+  .stat-card .value { font-size: 22px; font-weight: 800; }
+  .stat-card .sub { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+
+  /* controls */
+  .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  select {
+    padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text); font-size: 13.5px;
+  }
+
+  /* table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 780px; }
+  thead th {
+    text-align: left; padding: 12px 14px; background: var(--bg-alt); color: var(--text-dim);
+    font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .items-list { color: var(--text-muted); font-size: 12.5px; line-height: 1.5; }
+  .source-badge {
+    display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  }
+  .source-Meta { background: rgba(24,119,242,0.16); color: #6ea8ff; }
+  .source-TikTok { background: rgba(255,0,80,0.14); color: #ff5c8a; }
+  .source-Organic { background: rgba(34,211,238,0.14); color: var(--accent-cyan); }
+  .source-Other { background: rgba(139,92,246,0.14); color: #c4b5fd; }
+  .status-select {
+    padding: 5px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg-alt); color: var(--text);
+  }
+  .status-new { color: var(--accent-cyan); }
+  .status-contacted { color: var(--warn); }
+  .status-paid, .status-fulfilled { color: var(--whatsapp); }
+  .status-cancelled { color: var(--danger); }
+  .empty-msg { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+  #app-screen { display: none; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div id="login-screen">
+    <h2>Trendix Orders Dashboard</h2>
+    <p>Sign in to view orders and sales sources.</p>
+    <input type="password" id="password-input" placeholder="Admin password" autocomplete="current-password">
+    <button class="btn" id="login-btn">Sign in</button>
+    <p id="login-error">Wrong password.</p>
+  </div>
+
+  <div id="app-screen">
+    <header>
+      <h1><span>Trendix</span> Orders Dashboard</h1>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-ghost" id="refresh-btn">Refresh</button>
+        <button class="btn-ghost" id="logout-btn">Sign out</button>
+      </div>
+    </header>
+
+    <div class="stats" id="stats-row"></div>
+
+    <div class="controls">
+      <label for="status-filter" style="font-size:13px;color:var(--text-dim);">Status:</label>
+      <select id="status-filter">
+        <option value="">All</option>
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="paid">Paid</option>
+        <option value="fulfilled">Fulfilled</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Items</th><th>Total</th><th>Discount</th><th>Source</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="orders-body"></tbody>
+      </table>
+      <p class="empty-msg" id="empty-msg" style="display:none;">No orders yet.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const API_BASE = "https://api.trendix-market.com";
+  const TOKEN_KEY = "trendix-admin-token";
+
+  const loginScreen = document.getElementById("login-screen");
+  const appScreen = document.getElementById("app-screen");
+  const loginError = document.getElementById("login-error");
+
+  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+  function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
+  function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+  function money(n) {
+    const r = Math.round(n * 100) / 100;
+    return "$" + (Number.isInteger(r) ? r : r.toFixed(2));
+  }
+
+  async function login() {
+    const pw = document.getElementById("password-input").value;
+    loginError.style.display = "none";
+    try {
+      const res = await fetch(API_BASE + "/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pw })
+      });
+      if (!res.ok) { loginError.style.display = "block"; return; }
+      const data = await res.json();
+      setToken(data.token);
+      showApp();
+    } catch (e) {
+      loginError.textContent = "Network error — try again.";
+      loginError.style.display = "block";
+    }
+  }
+
+  function sourceClass(src) {
+    if (src.indexOf("Meta") === 0) return "source-Meta";
+    if (src.indexOf("TikTok") === 0) return "source-TikTok";
+    if (src.indexOf("Organic") === 0) return "source-Organic";
+    return "source-Other";
+  }
+
+  async function authedFetch(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({}, opts.headers, { Authorization: "Bearer " + getToken() });
+    const res = await fetch(API_BASE + path, opts);
+    if (res.status === 401) {
+      clearToken();
+      showLogin();
+      throw new Error("unauthorized");
+    }
+    return res;
+  }
+
+  async function loadStats() {
+    const res = await authedFetch("/stats");
+    const data = await res.json();
+    const row = document.getElementById("stats-row");
+    row.innerHTML = "";
+    const cards = [
+      { label: "Total orders", value: String(data.totalOrders), sub: "" },
+      { label: "Total revenue", value: money(data.totalRevenue), sub: "" }
+    ];
+    Object.keys(data.bySource).forEach((src) => {
+      const s = data.bySource[src];
+      cards.push({ label: src, value: String(s.count), sub: money(s.revenue) + " revenue" });
+    });
+    cards.forEach((c) => {
+      const div = document.createElement("div");
+      div.className = "stat-card";
+      div.innerHTML =
+        '<div class="label">' + c.label + '</div><div class="value">' + c.value + "</div>" +
+        (c.sub ? '<div class="sub">' + c.sub + "</div>" : "");
+      row.appendChild(div);
+    });
+  }
+
+  async function loadOrders() {
+    const status = document.getElementById("status-filter").value;
+    const qs = status ? "?status=" + encodeURIComponent(status) : "";
+    const res = await authedFetch("/orders" + qs);
+    const data = await res.json();
+    const body = document.getElementById("orders-body");
+    const emptyMsg = document.getElementById("empty-msg");
+    body.innerHTML = "";
+    emptyMsg.style.display = data.orders.length ? "none" : "block";
+
+    data.orders.forEach((o) => {
+      const tr = document.createElement("tr");
+
+      const itemsHtml = o.items.map((it) => it.name + " (" + it.plan + ") — " + money(it.price)).join("<br>");
+
+      const statusOptions = ["new", "contacted", "paid", "fulfilled", "cancelled"]
+        .map((s) => '<option value="' + s + '"' + (s === o.status ? " selected" : "") + ">" + s + "</option>")
+        .join("");
+
+      tr.innerHTML =
+        "<td>" + new Date(o.created_at + "Z").toLocaleString() + "</td>" +
+        '<td class="items-list">' + itemsHtml + "</td>" +
+        "<td>" + money(o.total) + "</td>" +
+        "<td>" + (o.discount_percent ? "-" + o.discount_percent + "%" : "—") + "</td>" +
+        '<td><span class="source-badge ' + sourceClass(o.source) + '">' + o.source + "</span></td>" +
+        '<td><select class="status-select status-' + o.status + '" data-id="' + o.id + '">' + statusOptions + "</select></td>";
+
+      body.appendChild(tr);
+    });
+
+    body.querySelectorAll(".status-select").forEach((sel) => {
+      sel.addEventListener("change", async () => {
+        const id = sel.getAttribute("data-id");
+        const newStatus = sel.value;
+        sel.className = "status-select status-" + newStatus;
+        try {
+          await authedFetch("/orders/" + id, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: newStatus })
+          });
+          loadStats();
+        } catch (e) {}
+      });
+    });
+  }
+
+  function refreshAll() {
+    loadStats().catch(() => {});
+    loadOrders().catch(() => {});
+  }
+
+  function showApp() {
+    loginScreen.style.display = "none";
+    appScreen.style.display = "block";
+    refreshAll();
+  }
+  function showLogin() {
+    appScreen.style.display = "none";
+    loginScreen.style.display = "block";
+  }
+
+  document.getElementById("login-btn").addEventListener("click", login);
+  document.getElementById("password-input").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+  document.getElementById("logout-btn").addEventListener("click", () => { clearToken(); showLogin(); });
+  document.getElementById("refresh-btn").addEventListener("click", refreshAll);
+  document.getElementById("status-filter").addEventListener("change", loadOrders);
+
+  if (getToken()) showApp(); else showLogin();
+})();
+</script>
+</body>
+</html>

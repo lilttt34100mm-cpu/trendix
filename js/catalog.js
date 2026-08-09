@@ -5,6 +5,9 @@
   "use strict";
 
   const CART_KEY = "trendix-cart-v1";
+  /* orders API (Cloudflare Worker + D1) — logs each checkout for the admin
+     dashboard; failure here must never block or delay the WhatsApp handoff */
+  const ORDERS_API = "https://api.trendix-market.com/order";
 
   /* ============================================================
      Cart incentive config — the ONE place to change thresholds/%s.
@@ -522,6 +525,37 @@
     }
   }
 
+  /* logs the order to the backend for the admin dashboard; best-effort and
+     silent — never throws, never delays/blocks the WhatsApp redirect */
+  function logOrderToBackend(entries, total, discPct) {
+    try {
+      const attribution = typeof window.trendixGetAttribution === "function" ? window.trendixGetAttribution() : {};
+      const payload = {
+        items: entries.map(({ product, plan }) => ({ name: product.name, plan: planLabel(plan), price: plan.price })),
+        subtotal: total,
+        discountPercent: discPct,
+        total: discountedTotal(total),
+        lang: currentLang(),
+        utm_source: attribution.utm_source || "",
+        utm_medium: attribution.utm_medium || "",
+        utm_campaign: attribution.utm_campaign || "",
+        utm_content: attribution.utm_content || "",
+        fbclid: attribution.fbclid || "",
+        ttclid: attribution.ttclid || "",
+        landing_page: attribution.landing_page || "",
+        referrer: attribution.referrer || ""
+      };
+      fetch(ORDERS_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {
+      /* never let logging break checkout */
+    }
+  }
+
   /* ============================================================
      Cart drawer open/close
      ============================================================ */
@@ -549,6 +583,9 @@
     if (checkoutBtn) {
       checkoutBtn.addEventListener("click", (e) => {
         if (checkoutBtn.classList.contains("disabled")) { e.preventDefault(); return; }
+        const entries = cartEntries();
+        const total = cartTotal();
+        logOrderToBackend(entries, total, activeDiscountPercent(total));
         setTimeout(() => { clearCart(); renderAll(); closeDrawer(); }, 50);
       });
     }
