@@ -842,9 +842,96 @@ html[dir="rtl"] .cart-drawer-panel { transform: translateX(-100%); }
 
 .cart-drawer-foot { padding: var(--space-lg); border-top: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: var(--space-md); }
 .cart-total-row { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 700; }
-.cart-total-amount { font-family: var(--font-en-heading); font-size: 20px; }
+.cart-total-amount { font-family: var(--font-en-heading); font-size: 20px; display: inline-flex; align-items: baseline; gap: 8px; }
 html[lang="ar"] .cart-total-amount { font-family: var(--font-ar); }
+.cart-total-original { font-size: 13px; font-weight: 600; color: var(--text-dim); text-decoration: line-through; }
+.cart-total-discount-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(37,211,102,0.16);
+  color: var(--whatsapp);
+  border: 1px solid rgba(37,211,102,0.35);
+}
 .btn-whatsapp.disabled { opacity: 0.45; pointer-events: none; }
+
+/* ============================================================
+   Cart progress bar — milestone discounts + smart suggestion
+   ============================================================ */
+.cart-progress { display: flex; flex-direction: column; gap: var(--space-sm); }
+.cart-progress-track {
+  position: relative;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  overflow: visible;
+}
+.cart-progress-fill {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0; bottom: 0;
+  width: 0%;
+  border-radius: var(--radius-pill);
+  background: var(--grad-brand);
+  transition: width 0.5s var(--ease-out);
+}
+.cart-progress-milestone {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: var(--pos, 50%);
+  transform: translate(-50%, -50%);
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 2px solid var(--border);
+  transition: background 0.4s var(--ease-out), border-color 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+  z-index: 1;
+}
+html[dir="rtl"] .cart-progress-milestone { transform: translate(50%, -50%); }
+.cart-progress-milestone.reached {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 4px rgba(34,211,238,0.18);
+}
+.cart-progress-milestone-label {
+  position: absolute;
+  bottom: 16px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: color 0.4s var(--ease-out);
+}
+html[dir="rtl"] .cart-progress-milestone-label { transform: translateX(50%); }
+.cart-progress-milestone.reached .cart-progress-milestone-label { color: var(--accent-cyan); }
+.cart-progress-msg { font-size: 13px; color: var(--text-muted); margin-top: var(--space-xs); }
+.cart-progress-msg strong { color: var(--text); }
+.cart-progress-msg.is-complete { color: var(--whatsapp); font-weight: 700; }
+.cart-progress-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--grad-brand-soft);
+  border: 1px solid rgba(139,92,246,0.3);
+}
+.cart-progress-suggestion span { font-size: 12.5px; color: var(--text); line-height: 1.4; }
+.cart-progress-suggestion-btn {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--text);
+  color: #06101f;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+.cart-progress-suggestion-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(255,255,255,0.3); }
 
 /* ============================================================
    Why us

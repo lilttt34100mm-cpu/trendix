@@ -6,6 +6,20 @@
 
   const CART_KEY = "trendix-cart-v1";
 
+  /* ============================================================
+     Cart incentive config — the ONE place to change thresholds/%s.
+     Thresholds are grounded in the catalog's actual top-seller prices
+     (avg. top-seller ≈ $29): milestone 1 sits at ~1.5x that average,
+     milestone 2 roughly double milestone 1.
+     ============================================================ */
+  const CART_MILESTONES = [
+    { threshold: 45, discountPercent: 5 },
+    { threshold: 90, discountPercent: 10 }
+  ];
+  /* higher-margin products to prefer suggesting when one of them alone
+     closes the gap to the next milestone, in priority order */
+  const SUGGESTION_PRIORITY = ["canva-pro", "capcut-pro", "picsart-pro", "duolingo-max", "youtube-premium"];
+
   /* current UI state */
   let activeCategory = "top";
   let searchQuery = "";
@@ -28,7 +42,8 @@
     return currentLang() === "ar" ? plan.labelAr : plan.label;
   }
   function money(n) {
-    return "$" + n;
+    const rounded = Math.round(n * 100) / 100;
+    return "$" + (Number.isInteger(rounded) ? rounded : rounded.toFixed(2));
   }
 
   /* ============================================================
@@ -65,6 +80,88 @@
   }
   function cartCount() {
     return Object.keys(cart).length;
+  }
+
+  /* ============================================================
+     Milestone discount logic
+     ============================================================ */
+  function activeDiscountPercent(total) {
+    let pct = 0;
+    CART_MILESTONES.forEach((m) => { if (total >= m.threshold) pct = m.discountPercent; });
+    return pct;
+  }
+  function discountedTotal(total) {
+    const pct = activeDiscountPercent(total);
+    return total * (1 - pct / 100);
+  }
+  function nextMilestone(total) {
+    return CART_MILESTONES.find((m) => total < m.threshold) || null;
+  }
+
+  /* Pick one product (its cheapest plan) to suggest toward the next milestone.
+     Priority items win when they alone close the gap; otherwise fall back to
+     whatever gets the customer closest without going over. */
+  function suggestProduct(remaining) {
+    const inCart = new Set(Object.keys(cart));
+    const candidates = PRODUCTS.filter((p) => !inCart.has(p.id)).map((p) => {
+      const cheapest = p.plans.reduce((a, b) => (b.price < a.price ? b : a));
+      return { product: p, plan: cheapest, price: cheapest.price };
+    });
+    if (!candidates.length) return null;
+
+    for (const id of SUGGESTION_PRIORITY) {
+      const c = candidates.find((c) => c.product.id === id);
+      if (c && c.price >= remaining) return { product: c.product, plan: c.plan, price: c.price, closes: true };
+    }
+
+    const under = candidates.filter((c) => c.price <= remaining).sort((a, b) => b.price - a.price);
+    if (under.length) {
+      const c = under[0];
+      return { product: c.product, plan: c.plan, price: c.price, closes: c.price === remaining };
+    }
+
+    const over = candidates.filter((c) => c.price > remaining).sort((a, b) => a.price - b.price);
+    if (over.length) {
+      const c = over[0];
+      return { product: c.product, plan: c.plan, price: c.price, closes: true };
+    }
+    return null;
+  }
+
+  function progressCopy(lang, total) {
+    const achieved = activeDiscountPercent(total);
+    const next = nextMilestone(total);
+    if (!next) {
+      return {
+        complete: true,
+        msg: lang === "ar"
+          ? `🎉 مبروك! فتحت خصم <strong>${achieved}%</strong> وبينطبق تلقائيًا عالطلب.`
+          : `🎉 You've unlocked <strong>${achieved}% off</strong> — applied to your order!`
+      };
+    }
+    const remaining = Math.max(0, next.threshold - total);
+    const remainingStr = money(Math.ceil(remaining * 100) / 100);
+    const msg = achieved > 0
+      ? (lang === "ar"
+          ? `خصم ${achieved}% مفعّل! انت على بعد <strong>${remainingStr}</strong> من خصم <strong>${next.discountPercent}%</strong>.`
+          : `${achieved}% off unlocked! You're <strong>${remainingStr}</strong> away from <strong>${next.discountPercent}% off</strong>.`)
+      : (lang === "ar"
+          ? `انت على بعد <strong>${remainingStr}</strong> من خصم <strong>${next.discountPercent}%</strong> عطلبك.`
+          : `You're <strong>${remainingStr}</strong> away from <strong>${next.discountPercent}% off</strong> your order.`);
+    return { complete: false, msg, remaining, next };
+  }
+
+  function suggestionCopy(lang, suggestion, nextDiscountPercent) {
+    const name = suggestion.product.name;
+    const price = money(suggestion.price);
+    if (suggestion.closes) {
+      return lang === "ar"
+        ? `ضيف ${name} (${price}) لتفتح خصم ${nextDiscountPercent}%.`
+        : `Add ${name} (${price}) to unlock ${nextDiscountPercent}% off.`;
+    }
+    return lang === "ar"
+      ? `ضيف ${name} (${price}) لتقرب من خصم ${nextDiscountPercent}%.`
+      : `Add ${name} (${price}) to get closer to ${nextDiscountPercent}% off.`;
   }
 
   function addToCart(id, planIndex) {
@@ -321,7 +418,17 @@
     }
 
     const total = cartTotal();
-    if (totalEl) totalEl.textContent = money(total);
+    const discPct = activeDiscountPercent(total);
+    if (totalEl) {
+      if (discPct > 0 && total > 0) {
+        totalEl.innerHTML =
+          '<span class="cart-total-original">' + money(total) + "</span>" +
+          "<span>" + money(discountedTotal(total)) + "</span>" +
+          '<span class="cart-total-discount-badge">-' + discPct + "%</span>";
+      } else {
+        totalEl.textContent = money(total);
+      }
+    }
     if (countEl) {
       const n = cartCount();
       countEl.textContent = String(n);
@@ -337,6 +444,8 @@
         checkoutBtn.setAttribute("href", "#");
       }
     }
+
+    renderProgress(total);
   }
 
   function buildCartWaLink(entries, total) {
@@ -347,8 +456,69 @@
     const lines = entries.map(
       ({ product, plan }) => "- " + product.name + " (" + planLabel(plan) + ") — " + money(plan.price)
     );
-    const text = [greeting, ...lines, "", totalLabel + ": " + money(total)].join("\n");
+    const extra = [];
+    const discPct = activeDiscountPercent(total);
+    if (discPct > 0) {
+      const discountLabel = lang === "ar" ? "الخصم" : "Discount";
+      const finalLabel = lang === "ar" ? "الإجمالي بعد الخصم" : "Total after discount";
+      extra.push("", discountLabel + ": -" + discPct + "%", finalLabel + ": " + money(discountedTotal(total)));
+    }
+    const text = [greeting, ...lines, "", totalLabel + ": " + money(total), ...extra].join("\n");
     return "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(text);
+  }
+
+  /* ============================================================
+     Render: cart progress bar (milestone discounts + suggestion)
+     ============================================================ */
+  function renderProgress(total) {
+    const fill = document.querySelector("[data-cart-progress-fill]");
+    const msgEl = document.querySelector("[data-cart-progress-msg]");
+    const suggestionWrap = document.querySelector("[data-cart-progress-suggestion]");
+    const suggestionText = document.querySelector("[data-cart-progress-suggestion-text]");
+    const suggestionBtn = document.querySelector("[data-cart-progress-suggestion-btn]");
+    if (!fill) return;
+
+    const lang = currentLang();
+    const maxThreshold = CART_MILESTONES[CART_MILESTONES.length - 1].threshold;
+    const fillPct = Math.min(100, (total / maxThreshold) * 100);
+    fill.style.width = fillPct + "%";
+
+    CART_MILESTONES.forEach((m, i) => {
+      const el = document.querySelector('[data-cart-progress-milestone="' + i + '"]');
+      const label = document.querySelector('[data-cart-progress-milestone-label="' + i + '"]');
+      if (!el) return;
+      const pos = (m.threshold / maxThreshold) * 100;
+      el.style.setProperty("--pos", pos + "%");
+      el.classList.toggle("reached", total >= m.threshold);
+      if (label) label.textContent = m.discountPercent + "%";
+    });
+
+    const copy = progressCopy(lang, total);
+    if (msgEl) {
+      msgEl.innerHTML = copy.msg;
+      msgEl.classList.toggle("is-complete", copy.complete);
+    }
+
+    if (copy.complete) {
+      if (suggestionWrap) suggestionWrap.hidden = true;
+      return;
+    }
+
+    const suggestion = suggestProduct(copy.remaining);
+    if (suggestion && suggestionWrap) {
+      suggestionWrap.hidden = false;
+      if (suggestionText) suggestionText.textContent = suggestionCopy(lang, suggestion, copy.next.discountPercent);
+      if (suggestionBtn) {
+        suggestionBtn.textContent = t("cart.progress.add");
+        suggestionBtn.onclick = () => {
+          const planIndex = suggestion.product.plans.indexOf(suggestion.plan);
+          addToCart(suggestion.product.id, planIndex);
+          openDrawer();
+        };
+      }
+    } else if (suggestionWrap) {
+      suggestionWrap.hidden = true;
+    }
   }
 
   /* ============================================================
