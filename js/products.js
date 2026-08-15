@@ -127,9 +127,5 @@ const PRODUCTS = [
   { id: "duolingo-super", name: "Duolingo Super", category: "learning", topSeller: false, logo: "duolingo.svg",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 40 }] },
   { id: "rezi-ai", name: "Rezi AI — Resume Builder", category: "learning", topSeller: false, logo: "rezi.png",
-    plans: [{ label: "Lifetime", labelAr: "مدى الحياة", price: 55 }] },
-  { id: "tiktok-monetized-account", name: "TikTok Monetized Account", category: "learning", topSeller: true, topSellerRank: 1, logo: "tiktok.png",
-    desc: "Eligible for profit on video views.", descAr: "مؤهل لتحقيق أرباح من مشاهدات الفيديو.",
-    limitedSpots: 12,
-    plans: [{ label: "Monthly", labelAr: "شهريًا", price: 25 }] }
+    plans: [{ label: "Lifetime", labelAr: "مدى الحياة", price: 55 }] }
 ];

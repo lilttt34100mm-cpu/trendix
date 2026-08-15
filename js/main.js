@@ -81,11 +81,19 @@
     const open = () => {
       overlay.classList.add("open");
       toggle.setAttribute("aria-expanded", "true");
+      // The header (with this hamburger button) sits at a higher z-index
+      // than the overlay so it stays clickable/visible while scrolling
+      // elsewhere on the site — but that also means it was rendering right
+      // on top of the overlay's own close (X) button, since both land in
+      // the same top-right spot. Hiding the hamburger while the overlay is
+      // open avoids the two icons blending into each other.
+      toggle.style.visibility = "hidden";
       document.body.style.overflow = "hidden";
     };
     const close = () => {
       overlay.classList.remove("open");
       toggle.setAttribute("aria-expanded", "false");
+      toggle.style.visibility = "";
       document.body.style.overflow = "";
     };
     toggle.addEventListener("click", open);
