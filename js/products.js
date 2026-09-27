@@ -49,11 +49,14 @@ const PRODUCTS = [
     plans: [{ label: "Pro Plan — 12 Months", labelAr: "خطة برو — 12 شهرًا", price: 125 }] },
   { id: "warp-ai", name: "Warp AI", category: "ai", topSeller: false, logo: "warp.png",
     plans: [{ label: "Build Plan — 12 Months", labelAr: "خطة البناء — 12 شهرًا", price: 125 }] },
+  { id: "higgsfield-pro", name: "Higgsfield Pro", category: "ai", topSeller: false, logo: "higgsfield.png",
+    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 155 }] },
 
   // ---------------- Design, Video & Productivity ----------------
   { id: "adobe-cc", name: "Adobe Creative Cloud", category: "design", topSeller: true, logo: "adobecc.png",
     plans: [
       { label: "1 Month", labelAr: "شهر واحد", price: 24 },
+      { label: "3 Months", labelAr: "3 أشهر", price: 50 },
       { label: "Individual — 12 Months", labelAr: "فردي — 12 شهرًا", price: 140 },
       { label: "Pro Plus Individual — 12 Months", labelAr: "برو بلس فردي — 12 شهرًا", price: 140 },
       { label: "K12 — 12 Months", labelAr: "K12 — 12 شهرًا", price: 140 },
@@ -72,12 +75,19 @@ const PRODUCTS = [
     ] },
   { id: "beautiful-ai", name: "Beautiful AI", category: "design", topSeller: false, logo: "beautifulai.png",
     plans: [{ label: "Pro Plan — 12 Months", labelAr: "خطة برو — 12 شهرًا", price: 75 }] },
+  { id: "grammarly", name: "Grammarly", category: "design", topSeller: false, logo: "grammarly.svg",
+    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 84 }] },
 
   // ---------------- Business & Workspace ----------------
   { id: "ms365", name: "Microsoft 365", category: "business", topSeller: true, logo: "microsoft365.png",
-    plans: [{ label: "12 Months — 1 User", labelAr: "12 شهرًا — مستخدم واحد", price: 45 }] },
+    plans: [
+      { label: "Personal Invite — 12 Months (1 User)", labelAr: "دعوة شخصية — 12 شهرًا (مستخدم واحد)", price: 45 },
+      { label: "Individual Key — 12 Months", labelAr: "مفتاح فردي — 12 شهرًا", price: 75 }
+    ] },
   { id: "office-proplus-2024", name: "Office ProPlus 2024 LTSC", category: "business", topSeller: false, logo: "microsoft365.png",
     plans: [{ label: "Lifetime — 1 PC", labelAr: "مدى الحياة — جهاز واحد", price: 25 }] },
+  { id: "ms365-family", name: "Microsoft 365 Family", category: "business", topSeller: false, logo: "microsoft365.png",
+    plans: [{ label: "12 Months — 6 Users", labelAr: "12 شهرًا — 6 مستخدمين", price: 105 }] },
   { id: "windows11-pro-key", name: "Windows 11 Pro License Key", category: "business", topSeller: true, logo: "windows11.png",
     plans: [{ label: "Lifetime", labelAr: "مدى الحياة", price: 20 }] },
   { id: "jira-premium", name: "Jira Software", category: "business", topSeller: false, logo: "jira.png",
@@ -95,7 +105,7 @@ const PRODUCTS = [
   { id: "anydesk-solo", name: "AnyDesk Solo", category: "business", topSeller: false, logo: "anydesk.png",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 75 }] },
   { id: "linkedin-business-premium", name: "LinkedIn Business Premium", category: "business", topSeller: false, logo: "linkedin.svg",
-    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 122 }] },
+    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 140 }] },
   { id: "linkedin-career", name: "LinkedIn Career", category: "business", topSeller: false, logo: "linkedin.svg",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 110 }] },
 
@@ -119,13 +129,17 @@ const PRODUCTS = [
 
   // ---------------- Learning & Entertainment ----------------
   { id: "youtube-premium", name: "YouTube Premium", category: "learning", topSeller: true, logo: "youtube.svg",
-    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 50 }] },
+    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 45 }] },
   { id: "coursera-plus", name: "Coursera Plus", category: "learning", topSeller: false, logo: "coursera.svg",
     plans: [{ label: "12 Months — Full Access", labelAr: "12 شهرًا — وصول كامل", price: 65 }] },
   { id: "duolingo-max", name: "Duolingo MAX", category: "learning", topSeller: true, logo: "duolingo.svg",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 60 }] },
   { id: "duolingo-super", name: "Duolingo Super", category: "learning", topSeller: false, logo: "duolingo.svg",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 40 }] },
+  { id: "anghami-plus", name: "Anghami Plus", category: "learning", topSeller: false, logo: "anghami.png",
+    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 30 }] },
+  { id: "iptv-smarters", name: "IPTV Smarters", category: "learning", topSeller: false, logo: "iptvsmarters.png",
+    plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 50 }] },
   { id: "rezi-ai", name: "Rezi AI — Resume Builder", category: "learning", topSeller: false, logo: "rezi.png",
     plans: [{ label: "Lifetime", labelAr: "مدى الحياة", price: 55 }] }
 ];
