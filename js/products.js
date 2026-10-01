@@ -31,6 +31,11 @@ const PRODUCTS = [
     plans: [{ label: "1 Month", labelAr: "شهر واحد", price: 75 }] },
   { id: "claude-pro", name: "Claude Pro", category: "ai", topSeller: true, badge: "popular", logo: "claude.svg",
     plans: [{ label: "1 Month", labelAr: "شهر واحد", price: 19 }] },
+  { id: "chatgpt", name: "ChatGPT Plus", category: "ai", topSeller: true, logo: "chatgpt.svg",
+    plans: [
+      { label: "Private Account — 4 Months (Guaranteed)", labelAr: "حساب خاص — 4 أشهر (مضمون)", price: 59 },
+      { label: "Shared Account — 12 Months (Guaranteed)", labelAr: "حساب مشترك — 12 شهرًا (مضمون)", price: 49 }
+    ] },
   { id: "perplexity-pro", name: "Perplexity AI Pro", category: "ai", topSeller: false, logo: "perplexity.png",
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 80 }] },
   { id: "manus-ai-pro", name: "Manus AI Pro", category: "ai", topSeller: false, logo: "manus.png",
