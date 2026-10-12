@@ -74,6 +74,7 @@
         const product = getProduct(id);
         if (!product) return null;
         const planIndex = cart[id] || 0;
+        if (product.outOfStock) return null;
         const plan = product.plans[planIndex] || product.plans[0];
         return { product, planIndex, plan };
       })
@@ -107,7 +108,7 @@
      whatever gets the customer closest without going over. */
   function suggestProduct(remaining) {
     const inCart = new Set(Object.keys(cart));
-    const candidates = PRODUCTS.filter((p) => !inCart.has(p.id)).map((p) => {
+    const candidates = PRODUCTS.filter((p) => !inCart.has(p.id) && !p.outOfStock).map((p) => {
       const cheapest = p.plans.reduce((a, b) => (b.price < a.price ? b : a));
       return { product: p, plan: cheapest, price: cheapest.price };
     });
@@ -169,6 +170,7 @@
   }
 
   function addToCart(id, planIndex) {
+    if (getProduct(id)?.outOfStock) return;
     cart[id] = planIndex || 0;
     saveCart();
     renderAll();
@@ -279,10 +281,11 @@
       const card = document.createElement("div");
       card.className = "product-card spotlight glass-edge";
 
-      if (product.badge) {
+      const badgeKey = product.outOfStock ? "soldout" : product.badge;
+      if (badgeKey) {
         const badge = document.createElement("span");
-        badge.className = "product-badge badge-" + product.badge;
-        badge.textContent = t("product.badge." + product.badge);
+        badge.className = "product-badge badge-" + badgeKey;
+        badge.textContent = t("product.badge." + badgeKey);
         card.appendChild(badge);
       }
 
@@ -338,6 +341,10 @@
       const priceEl = document.createElement("div");
       priceEl.className = "product-price";
       function paintPrice() {
+        if (product.outOfStock) {
+          priceEl.innerHTML = '<span class="unit stock-note">' + t("product.outOfStockNote") + "</span>";
+          return;
+        }
         const plan = product.plans[uiPlan[product.id]];
         priceEl.innerHTML =
           '<span class="amount">' + money(plan.price) + '</span><span class="unit">' + planLabel(plan) + "</span>";
@@ -384,6 +391,11 @@
       const inCart = product.id in cart;
       addBtn.className = "btn btn-primary btn-block add-to-cart-btn" + (inCart ? " in-cart" : "");
       addBtn.textContent = inCart ? t("product.inCart") : t("product.addToCart");
+      if (product.outOfStock) {
+        addBtn.className = "btn btn-block add-to-cart-btn out-of-stock";
+        addBtn.textContent = t("product.outOfStock");
+        addBtn.disabled = true;
+      }
       addBtn.addEventListener("click", () => addToCart(product.id, uiPlan[product.id]));
       card.appendChild(addBtn);
 

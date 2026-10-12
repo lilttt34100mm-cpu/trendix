@@ -761,6 +761,9 @@ html[lang="ar"] .product-badge { text-transform: none; letter-spacing: 0; }
 html[lang="ar"] .product-price .amount { font-family: var(--font-ar); }
 .product-price .unit { font-size: 12.5px; color: var(--text-dim); }
 
+.product-badge.badge-soldout { background: rgba(248,113,113,0.14); color: #fca5a5; border: 1px solid rgba(248,113,113,0.3); }
+.product-price .stock-note { font-size: 13.5px; }
+.add-to-cart-btn.out-of-stock { background: var(--surface-2); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); cursor: not-allowed; }
 .add-to-cart-btn.in-cart { background: var(--surface-2); color: var(--accent-cyan); border: 1px solid rgba(34,211,238,0.35); }
 
 /* ============================================================

@@ -10,6 +10,9 @@
    "desc"/"descAr" (optional): short one-line pitch shown on the card.
    "limitedSpots" (optional): monthly inventory cap shown as a scarcity
    badge on the card (purely informational — not enforced by the cart).
+   "outOfStock" (optional): true hides the price, shows a "temporarily
+   out of stock" badge and disables add-to-cart (also kept out of the
+   cart and upsell suggestions).
    "topSellerRank" (optional, only matters within the "Top Sellers" tab):
    lower sorts first; items without it keep their natural array order
    after all ranked items. */
@@ -29,7 +32,7 @@ const PRODUCTS = [
     plans: [{ label: "12 Months", labelAr: "12 شهرًا", price: 80 }] },
   { id: "google-ai-ultra", name: "Google AI Ultra", category: "ai", topSeller: false, logo: "googlegemini.png",
     plans: [{ label: "1 Month", labelAr: "شهر واحد", price: 75 }] },
-  { id: "claude-pro", name: "Claude Pro", category: "ai", topSeller: true, badge: "popular", logo: "claude.svg",
+  { id: "claude-pro", name: "Claude Pro", category: "ai", topSeller: true, outOfStock: true, logo: "claude.svg",
     plans: [{ label: "1 Month", labelAr: "شهر واحد", price: 19 }] },
   { id: "chatgpt", name: "ChatGPT Plus", category: "ai", topSeller: true, logo: "chatgpt.svg",
     plans: [
