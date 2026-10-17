@@ -869,6 +869,17 @@ html[dir="rtl"] .cart-drawer-panel { transform: translateX(-100%); }
 .cart-item-remove svg { width: 15px; height: 15px; }
 
 .cart-drawer-foot { padding: var(--space-lg); border-top: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: var(--space-md); }
+.cart-ref { display: flex; flex-direction: column; gap: 6px; }
+.cart-ref label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.cart-ref input {
+  width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--bg-alt); color: var(--text); font: 600 15px/1.2 var(--font-en-body); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.cart-ref input::placeholder { color: var(--text-dim); letter-spacing: 0; text-transform: none; font-weight: 400; }
+.cart-ref input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
+.cart-ref-msg { margin: 0; font-size: 12.5px; line-height: 1.5; }
+.cart-ref-msg.is-ok { color: var(--whatsapp); }
+.cart-ref-msg.is-bad { color: var(--danger); }
 .cart-total-row { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 700; }
 .cart-total-amount { font-family: var(--font-en-heading); font-size: 20px; display: inline-flex; align-items: baseline; gap: 8px; }
 html[lang="ar"] .cart-total-amount { font-family: var(--font-ar); }

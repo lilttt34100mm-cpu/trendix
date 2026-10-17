@@ -82,6 +82,30 @@
   .status-cancelled { color: var(--danger); }
   .empty-msg { text-align: center; padding: 60px 20px; color: var(--text-dim); }
   #app-screen { display: none; }
+
+  /* tabs + referrals */
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab { padding: 9px 16px; background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); font-weight: 600; }
+  .tab.active { color: var(--text); border-color: var(--primary); background: var(--surface-2); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .ref-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; align-items: end;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 18px; }
+  .ref-form label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-dim); }
+  .ref-form input, .ref-form select, .ref-input {
+    padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-alt); color: var(--text); font-size: 13.5px; }
+  .ref-input { width: 110px; padding: 5px 8px; font-size: 12px; text-transform: uppercase; }
+  .ref-note { font-size: 12.5px; color: var(--text-dim); margin: -6px 0 18px; line-height: 1.6; }
+  .ref-created { background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.4); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 18px; font-size: 13.5px; display: none; }
+  .ref-created code { font-size: 15px; font-weight: 800; color: var(--whatsapp); }
+  .tier-badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .tier-1 { background: rgba(34,211,238,0.14); color: var(--accent-cyan); }
+  .tier-2 { background: rgba(37,211,102,0.14); color: var(--whatsapp); }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .muted { color: var(--text-dim); font-size: 12px; }
+  .act { padding: 5px 10px; font-size: 12px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); margin: 2px 4px 2px 0; }
+  .act:hover { border-color: var(--primary); }
+  .ref-code-cell .reward { display: block; margin-top: 4px; font-size: 11.5px; color: var(--whatsapp); }
 </style>
 </head>
 <body>
@@ -104,6 +128,12 @@
       </div>
     </header>
 
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="orders" role="tab">Orders</button>
+      <button class="tab" data-tab="referrals" role="tab">Referrals</button>
+    </div>
+
+    <div class="panel active" id="panel-orders">
     <div class="stats" id="stats-row"></div>
 
     <div class="controls">
@@ -122,12 +152,40 @@
       <table>
         <thead>
           <tr>
-            <th>Date</th><th>Items</th><th>Total</th><th>Discount</th><th>Source</th><th>Status</th>
+            <th>Date</th><th>Items</th><th>Total</th><th>Discount</th><th>Source</th><th>Referral</th><th>Status</th>
           </tr>
         </thead>
         <tbody id="orders-body"></tbody>
       </table>
       <p class="empty-msg" id="empty-msg" style="display:none;">No orders yet.</p>
+    </div>
+    </div>
+
+    <div class="panel" id="panel-referrals">
+      <div class="ref-form">
+        <label>Tier
+          <select id="ref-tier"><option value="1">1 · Customer (store credit)</option><option value="2">2 · Partner (cash)</option></select>
+        </label>
+        <label>Name<input id="ref-name" type="text" placeholder="Rami"></label>
+        <label>WhatsApp number<input id="ref-phone" type="text" placeholder="+961 …"></label>
+        <label>Payout method (tier 2)<input id="ref-method" type="text" placeholder="Local transfer, Whish…"></label>
+        <label>Custom code (optional)<input id="ref-code" type="text" maxlength="16" placeholder="Auto"></label>
+        <button class="btn" id="ref-create">Create code</button>
+      </div>
+      <p class="ref-note">Rewards appear when a referred order is marked <b>fulfilled</b>: $2 per subscription, $4 per ChatGPT, $0 for Claude.
+        They can be used 7 days later. Tier 1 credit: at most $4 per order, expires after 90 days. Tier 2 cash: paid once at least $10 is payable.
+        The referred friend's $1 off their first order is given on WhatsApp.</p>
+      <div class="ref-created" id="ref-created"></div>
+      <div class="stats" id="ref-stats"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Code</th><th>Tier</th><th>Owner</th><th>Orders</th><th>Pending (7-day hold)</th><th>Available</th><th>Used / paid</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="ref-body"></tbody>
+        </table>
+        <p class="empty-msg" id="ref-empty" style="display:none;">No referral codes yet. Create the first one above.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -149,6 +207,10 @@
   function money(n) {
     const r = Math.round(n * 100) / 100;
     return "$" + (Number.isInteger(r) ? r : r.toFixed(2));
+  }
+  // order data comes from a public form, so everything shown is escaped
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
   async function login() {
@@ -225,19 +287,25 @@
     data.orders.forEach((o) => {
       const tr = document.createElement("tr");
 
-      const itemsHtml = o.items.map((it) => it.name + " (" + it.plan + ") — " + money(it.price)).join("<br>");
+      const itemsHtml = o.items.map((it) => esc(it.name) + " (" + esc(it.plan) + ") — " + money(Number(it.price) || 0)).join("<br>");
 
       const statusOptions = ["new", "contacted", "paid", "fulfilled", "cancelled"]
         .map((s) => '<option value="' + s + '"' + (s === o.status ? " selected" : "") + ">" + s + "</option>")
         .join("");
 
+      const refCell =
+        '<input class="ref-input" data-ref-for="' + o.id + '" value="' + esc(o.ref_code || "") + '" placeholder="—" maxlength="16"' +
+        (o.status === "fulfilled" && o.ref_code ? " disabled title=\"Locked: this order already earned a reward\"" : "") + ">" +
+        (o.ref_code ? '<span class="reward">' + money(o.reward) + " reward" + (o.status === "fulfilled" ? "" : " when fulfilled") + "</span>" : "");
+
       tr.innerHTML =
         "<td>" + new Date(o.created_at + "Z").toLocaleString() + "</td>" +
         '<td class="items-list">' + itemsHtml + "</td>" +
         "<td>" + money(o.total) + "</td>" +
-        "<td>" + (o.discount_percent ? "-" + o.discount_percent + "%" : "—") + "</td>" +
-        '<td><span class="source-badge ' + sourceClass(o.source) + '">' + o.source + "</span></td>" +
-        '<td><select class="status-select status-' + o.status + '" data-id="' + o.id + '">' + statusOptions + "</select></td>";
+        "<td>" + (o.discount_percent ? "-" + esc(o.discount_percent) + "%" : "—") + "</td>" +
+        '<td><span class="source-badge ' + sourceClass(o.source) + '">' + esc(o.source) + "</span></td>" +
+        '<td class="ref-code-cell">' + refCell + "</td>" +
+        '<td><select class="status-select status-' + esc(o.status) + '" data-id="' + o.id + '">' + statusOptions + "</select></td>";
 
       body.appendChild(tr);
     });
@@ -254,15 +322,129 @@
             body: JSON.stringify({ status: newStatus })
           });
           loadStats();
+          loadOrders().catch(() => {});
+          loadReferrals().catch(() => {});
         } catch (e) {}
       });
     });
+
+    // a customer may only mention the code in the WhatsApp chat: Karam types it here
+    body.querySelectorAll(".ref-input").forEach((inp) => {
+      inp.addEventListener("change", async () => {
+        const id = inp.getAttribute("data-ref-for");
+        const res = await authedFetch("/orders/" + id, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ref_code: inp.value.trim() })
+        });
+        if (!res.ok) { const d = await res.json().catch(() => ({})); alert(d.error || "Could not save the code."); }
+        loadOrders().catch(() => {});
+        loadReferrals().catch(() => {});
+      });
+    });
+  }
+
+  // ---------------- referrals ----------------
+  async function loadReferrals() {
+    const res = await authedFetch("/referrals");
+    const data = await res.json();
+    const list = data.referrals || [];
+    const body = document.getElementById("ref-body");
+    document.getElementById("ref-empty").style.display = list.length ? "none" : "block";
+    const t1 = list.filter((r) => r.tier === 1), t2 = list.filter((r) => r.tier === 2);
+    const sum = (a, k) => a.reduce((s, r) => s + (r[k] || 0), 0);
+    const cards = [
+      { label: "Codes", value: String(list.length), sub: t1.length + " customers · " + t2.length + " partners" },
+      { label: "Referred orders", value: String(sum(list, "orders")), sub: "fulfilled" },
+      { label: "Customer credit available", value: money(sum(t1, "credit_balance")), sub: money(sum(t1, "credit_used")) + " used" },
+      { label: "Partner cash payable", value: money(sum(t2, "payable")), sub: money(sum(t2, "paid_total")) + " paid" }
+    ];
+    document.getElementById("ref-stats").innerHTML = cards.map((c) =>
+      '<div class="stat-card"><div class="label">' + c.label + '</div><div class="value">' + c.value + '</div><div class="sub">' + c.sub + "</div></div>").join("");
+
+    body.innerHTML = list.map((r) => {
+      const link = "https://trendix-market.com/?ref=" + encodeURIComponent(r.code);
+      const avail = r.tier === 1
+        ? money(r.credit_balance) + ' <span class="muted">credit' + (r.credit_expired ? " · " + money(r.credit_expired) + " expired" : "") + "</span>"
+        : money(r.payable) + ' <span class="muted">cash</span>';
+      const used = r.tier === 1 ? money(r.credit_used) : money(r.paid_total);
+      const action = r.tier === 1
+        ? '<button class="act" data-redeem="' + esc(r.code) + '">Use credit</button>'
+        : '<button class="act" data-payout="' + esc(r.code) + '">Record payout</button>';
+      return "<tr" + (r.active ? "" : ' style="opacity:.5"') + ">" +
+        '<td><b>' + esc(r.code) + '</b><br><button class="act" data-copy="' + esc(link) + '">Copy link</button></td>' +
+        '<td><span class="tier-badge tier-' + r.tier + '">' + (r.tier === 1 ? "Customer" : "Partner") + "</span></td>" +
+        "<td>" + esc(r.owner_name) + (r.owner_phone ? '<br><span class="muted">' + esc(r.owner_phone) + "</span>" : "") +
+        (r.tier === 2 && r.payout_method ? '<br><span class="muted">' + esc(r.payout_method) + "</span>" : "") + "</td>" +
+        '<td class="num">' + r.orders + "</td>" +
+        '<td class="num">' + money(r.pending) + "</td>" +
+        '<td class="num">' + avail + "</td>" +
+        '<td class="num">' + used + "</td>" +
+        "<td>" + action + '<button class="act" data-toggle="' + esc(r.code) + '" data-active="' + (r.active ? 1 : 0) + '">' + (r.active ? "Deactivate" : "Activate") + "</button></td>" +
+        "</tr>";
+    }).join("");
+
+    const post = async (path, payload) => {
+      const res = await authedFetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) alert(d.error || "Something went wrong.");
+      return d;
+    };
+    body.querySelectorAll("[data-redeem]").forEach((b) => b.addEventListener("click", async () => {
+      const amount = prompt("How much credit to use on this order? (max $4)");
+      if (!amount) return;
+      const orderId = prompt("Order number it is used on (optional, leave empty if none)") || null;
+      await post("/referrals/" + encodeURIComponent(b.dataset.redeem) + "/redeem", { amount: Number(amount), order_id: orderId });
+      loadReferrals();
+    }));
+    body.querySelectorAll("[data-payout]").forEach((b) => b.addEventListener("click", async () => {
+      const reference = prompt("Payout reference (transfer number or note). This pays everything payable for this partner.");
+      if (reference === null) return;
+      const d = await post("/referrals/" + encodeURIComponent(b.dataset.payout) + "/payout", { reference });
+      if (d.ok) alert("Recorded: " + money(d.amount) + " for " + d.rewards + " order(s).");
+      loadReferrals();
+    }));
+    body.querySelectorAll("[data-toggle]").forEach((b) => b.addEventListener("click", async () => {
+      await authedFetch("/referrals/" + encodeURIComponent(b.dataset.toggle), {
+        method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: b.dataset.active !== "1" })
+      });
+      loadReferrals();
+    }));
+    body.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; } catch (e) { prompt("Copy this link:", b.dataset.copy); }
+    }));
+  }
+
+  async function createReferral() {
+    const payload = {
+      tier: Number(document.getElementById("ref-tier").value),
+      owner_name: document.getElementById("ref-name").value.trim(),
+      owner_phone: document.getElementById("ref-phone").value.trim(),
+      payout_method: document.getElementById("ref-method").value.trim(),
+      code: document.getElementById("ref-code").value.trim()
+    };
+    const res = await authedFetch("/referrals", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const d = await res.json().catch(() => ({}));
+    const box = document.getElementById("ref-created");
+    if (!res.ok) { alert(d.error || "Could not create the code."); return; }
+    const link = "https://trendix-market.com/?ref=" + d.code;
+    box.style.display = "block";
+    box.innerHTML = "Created <code>" + esc(d.code) + "</code> for " + esc(payload.owner_name) + ". Their link: <b>" + esc(link) + "</b>";
+    ["ref-name", "ref-phone", "ref-method", "ref-code"].forEach((id) => { document.getElementById(id).value = ""; });
+    loadReferrals();
   }
 
   function refreshAll() {
     loadStats().catch(() => {});
     loadOrders().catch(() => {});
+    loadReferrals().catch(() => {});
   }
+
+  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("active", x === b));
+    document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === "panel-" + b.dataset.tab));
+  }));
+  document.getElementById("ref-create").addEventListener("click", createReferral);
 
   function showApp() {
     loginScreen.style.display = "none";

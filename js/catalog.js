@@ -518,8 +518,67 @@
       const finalLabel = lang === "ar" ? "الإجمالي بعد الخصم" : "Total after discount";
       extra.push("", discountLabel + ": -" + discPct + "%", finalLabel + ": " + money(discountedTotal(total)));
     }
+    if (refState.valid) extra.push("", t("cart.ref.wa") + ": " + refState.code);
     const text = [greeting, ...lines, "", totalLabel + ": " + money(total), ...extra].join("\n");
     return "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(text);
+  }
+
+  /* ============================================================
+     Referral code: optional box in the cart. Pre-filled from a partner link (?ref=CODE), checked against the API,
+     added to the WhatsApp message and the order log only when the code is real. Never blocks checkout.
+     ============================================================ */
+  const REF_API = "https://api.trendix-market.com/ref/";
+  const REF_KEY = "trendix-ref";
+  const refState = { code: "", valid: false };
+  let refTimer = null;
+  let refSeq = 0;
+
+  function refStore(code) {
+    try { if (code) localStorage.setItem(REF_KEY, code); else localStorage.removeItem(REF_KEY); } catch (e) {}
+  }
+  function refRender() {
+    const input = document.querySelector("[data-cart-ref]");
+    const msg = document.querySelector("[data-cart-ref-msg]");
+    if (input) input.setAttribute("placeholder", t("cart.ref.placeholder"));
+    if (!msg) return;
+    if (!refState.code || refState.checking) { msg.hidden = true; return; }
+    msg.hidden = false;
+    msg.textContent = refState.valid ? t("cart.ref.ok") : t("cart.ref.bad");
+    msg.classList.toggle("is-ok", refState.valid);
+    msg.classList.toggle("is-bad", !refState.valid);
+  }
+  function refCheck(raw) {
+    const code = String(raw || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16);
+    refState.code = code;
+    refState.valid = false;
+    const seq = ++refSeq;
+    if (code.length < 3) { refState.checking = false; refStore(""); refRender(); renderCart(); return; }
+    refState.checking = true;
+    refRender();
+    fetch(REF_API + encodeURIComponent(code))
+      .then((r) => r.json())
+      .then((d) => {
+        if (seq !== refSeq) return;
+        refState.checking = false;
+        refState.valid = !!(d && d.valid);
+        refStore(refState.valid ? code : "");
+        refRender();
+        renderCart();
+      })
+      .catch(() => { if (seq === refSeq) { refState.checking = false; refRender(); } });
+  }
+  function initReferral() {
+    const input = document.querySelector("[data-cart-ref]");
+    if (!input) return;
+    let start = "";
+    try { start = new URLSearchParams(location.search).get("ref") || localStorage.getItem(REF_KEY) || ""; } catch (e) {}
+    input.value = start.toUpperCase();
+    input.addEventListener("input", () => {
+      input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      clearTimeout(refTimer);
+      refTimer = setTimeout(() => refCheck(input.value), 450);
+    });
+    if (start) refCheck(start); else refRender();
   }
 
   /* ============================================================
@@ -594,7 +653,8 @@
         fbclid: attribution.fbclid || "",
         ttclid: attribution.ttclid || "",
         landing_page: attribution.landing_page || "",
-        referrer: attribution.referrer || ""
+        referrer: attribution.referrer || "",
+        ref_code: refState.valid ? refState.code : ""
       };
       fetch(ORDERS_API, {
         method: "POST",
@@ -666,11 +726,13 @@
     renderAll();
     initSearch();
     initCartDrawer();
+    initReferral();
   });
 
   document.addEventListener("trendix:langchange", () => {
     const input = document.querySelector("[data-catalog-search]");
     if (input) input.setAttribute("placeholder", t("catalog.search.placeholder"));
     renderAll();
+    refRender();
   });
 })();
